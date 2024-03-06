@@ -10,7 +10,8 @@ class SimulationService:
 
     @staticmethod
     def get_simulation_detail(simulation_id):
-        query = "SELECT * FROM simulations WHERE id = %s;"
+        query = "SELECT id, name, machine_id, status, creation_date, update_date " \
+                "FROM simulations WHERE id = %s;"
         params = [simulation_id]
         simulation_json = {}
         with fetch_one(query, params) as simulation:
@@ -26,7 +27,7 @@ class SimulationService:
 
     @staticmethod
     def get_simulations(status=None, order_by="creation_date"):
-        query = "SELECT * FROM simulations"
+        query = "SELECT id, name, machine_id, status, creation_date, update_date FROM simulations"
         params = []
 
         if status:
@@ -53,7 +54,7 @@ class SimulationService:
 
     @staticmethod
     def get_machines():
-        query = "SELECT * FROM machines"
+        query = "SELECT id, name FROM machines"
         with fetch_all(query) as machines:
             if machines:
                 machines = [{"machine_id": item[0], "name": item[1]} for item in machines]
