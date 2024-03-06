@@ -15,7 +15,7 @@ def fetch_all(query, params=None):
             rows = cursor.fetchall()
             yield rows
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
+        logging.error(f"Database operation failed: {error}")
         raise
 
 
@@ -27,7 +27,7 @@ def fetch_one(query, params=None):
             id = cursor.fetchone()
             yield id
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
+        logging.error(f"Database operation failed: {error}")
         raise
 
 
