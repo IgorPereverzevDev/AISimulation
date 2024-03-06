@@ -42,7 +42,7 @@ class TestSimulationService(TestCase):
         with patch('service.simulation_service.fetch_all') as mock_get_db_connection:
             mock_get_db_connection.return_value.__enter__.return_value = machines
             result = SimulationService.get_machines()
-            mock_get_db_connection.assert_called_once_with("SELECT * FROM machines")
+            mock_get_db_connection.assert_called_once_with("SELECT id, name FROM machines")
             assert result == expected_machine
 
     def test_get_converge_graph(self):
@@ -72,34 +72,42 @@ class TestSimulationService(TestCase):
         with patch('service.simulation_service.fetch_all') as mock_get_db_connection:
             mock_get_db_connection.return_value.__enter__.return_value = simulations
             simulations = SimulationService.get_simulations()
-            mock_get_db_connection.assert_called_once_with("SELECT * FROM simulations ORDER BY creation_date")
+            mock_get_db_connection.assert_called_once_with("SELECT id, name, machine_id, status, "
+                                                           "creation_date, update_date "
+                                                           "FROM simulations ORDER BY creation_date")
             self.assertEqual(len(simulations), 1)
             self.assertEqual(simulations[0]['simulation_id'], '1')
 
     def test_get_simulations_no_status(self):
         with patch('service.simulation_service.fetch_all') as mock_get_db:
             SimulationService.get_simulations()
-            mock_get_db.assert_called_once_with("SELECT * FROM simulations ORDER BY creation_date")
+            mock_get_db.assert_called_once_with("SELECT id, name, machine_id, status, creation_date, update_date "
+                                                "FROM simulations ORDER BY creation_date")
 
     def test_get_simulations_with_status(self):
         with patch('service.simulation_service.fetch_all') as mock_get_db:
             SimulationService.get_simulations(status="running")
-            mock_get_db.assert_called_once_with("SELECT * FROM simulations WHERE status = %s ORDER BY creation_date")
+            mock_get_db.assert_called_once_with("SELECT id, name, machine_id, status, creation_date, update_date "
+                                                "FROM simulations WHERE status = %s ORDER BY creation_date")
 
     def test_get_simulations_order_by(self):
         with patch('service.simulation_service.fetch_all') as mock_get_db:
             SimulationService.get_simulations(order_by="name")
-            mock_get_db.assert_called_once_with("SELECT * FROM simulations ORDER BY name")
+            mock_get_db.assert_called_once_with("SELECT id, name, machine_id, status, creation_date, update_date "
+                                                "FROM simulations ORDER BY name")
 
     def test_get_simulations_order_by_update_date(self):
         with patch('service.simulation_service.fetch_all') as mock_get_db:
             SimulationService.get_simulations(order_by="update_date")
-            mock_get_db.assert_called_once_with("SELECT * FROM simulations ORDER BY update_date")
+            mock_get_db.assert_called_once_with("SELECT id, name, machine_id, status, creation_date, update_date "
+                                                "FROM simulations ORDER BY update_date")
 
     def test_get_simulations_invalid_order_by(self):
         with patch('service.simulation_service.fetch_all') as mock_get_db:
             SimulationService.get_simulations(order_by="invalid_column")
-            mock_get_db.assert_called_once_with("SELECT * FROM simulations ORDER BY creation_date")
+            mock_get_db.assert_called_once_with(
+                "SELECT id, name, machine_id, status, creation_date, update_date "
+                "FROM simulations ORDER BY creation_date")
 
     def test_get_simulation_detail_found(self):
         with patch('service.simulation_service.fetch_one') as mock_get_db:
