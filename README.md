@@ -181,6 +181,16 @@ Additional workers are needed to process the queue. RabbitMQ, which is also avai
 ## Functional Improvements:
 
 Currently, there is the capability to run a single application on two machines, meaning each application is launched with unique machine IDs. However, there is no ability to run the application on another machine that has been previously registered in the database with a unique ID. We can add the ability to process different simulations on different machines by making modifications to the code and synchronizing with the database.
+Locks when selecting statuses: Frequent updates to simulation statuses in your application can lead to locks. Consider using optimistic locking for managing concurrent updates or implement retry logic to handle exceptions due to locks.
+
+Handling stuck/failed tasks: For task queues (e.g., with Celery), it's crucial to have mechanisms to detect and recover tasks that haven't completed successfully. 
+
+Approaches include:
+
+Heartbeat mechanisms: Regular "I'm alive" signals from tasks to identify stuck tasks.
+Execution timeouts: Setting a maximum execution time after which a task is considered failed.
+Retries: Automatically restarting a task if it fails.
+Monitoring and alerts: Setting up monitoring systems to notify about a high number of failed or stuck tasks.
 
 ## Non-Functional Improvements:
 We need to add validation for each request.
