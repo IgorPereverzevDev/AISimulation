@@ -1,0 +1,41 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://test:524745@db:5432/origen
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: 524745
+      POSTGRES_DB: origen
+
+  redis:
+    image: redis:7.2.4
+
+  celery_worker:
+    build: .
+    command: celery -A worker.celery_worker.celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - web
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+volumes:
+  postgres_data:
