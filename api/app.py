@@ -18,11 +18,14 @@ async def get_simulations(status: SimulationStatus = None,
 @app.get("/simulations/{simulation_id}")
 async def get_simulation_detail(simulation_id: int =
                                 Path(..., description="The ID of the simulation to retrieve details for")):
-    simulation_detail = SimulationService.get_simulation_detail(simulation_id)
-    if simulation_detail:
-        return simulation_detail
-    else:
-        raise HTTPException(status_code=404, detail="Simulation not found")
+    try:
+        simulation_detail = SimulationService.get_simulation_detail(simulation_id)
+        if simulation_detail:
+            return simulation_detail
+        else:
+            raise HTTPException(status_code=404, detail="Simulation not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/machines")
